@@ -21,6 +21,23 @@ If `CLAUDE.md` and an issue conflict, ask — do not silently pick.
 
 Why: every change is traceable, and the history reads as a series of intentional units.
 
+## Labels (canonical list)
+
+Issues are labelled by **work type**, mirroring the commit/branch `<type>`. Pick the one
+that matches the change. Do NOT invent new labels without an issue to track it.
+
+| Label      | Use for                                  |
+| ---------- | ---------------------------------------- |
+| `feat`     | New feature                              |
+| `fix`      | Bug fix                                  |
+| `chore`    | Tooling, dependencies, config            |
+| `refactor` | Code change with no behavior change      |
+| `test`     | Tests only                               |
+| `docs`     | Documentation only                       |
+
+GitHub's triage labels (`question`, `help wanted`, `good first issue`, `duplicate`,
+`invalid`, `wontfix`) still exist and are orthogonal — use them as flags, not as the type.
+
 ## Branch naming
 
 ```
