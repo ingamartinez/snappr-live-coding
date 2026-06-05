@@ -1,44 +1,35 @@
 import type { Photographer } from "@snappr/shared";
-import { pool } from "../db/pool.js";
+import { desc, eq } from "drizzle-orm";
+import { db } from "../db/client.js";
+import { photographers } from "../db/schema.js";
 
-// Map a raw snake_case DB row to the camelCase shared contract.
-interface PhotographerRow {
-  id: number;
-  name: string;
-  city: string;
-  hourly_rate: number;
-  rating: string; // pg returns NUMERIC as string
-  created_at: Date;
-}
-
-function toPhotographer(row: PhotographerRow): Photographer {
+// Map a typed DB row to the camelCase shared contract (rating is numeric -> string).
+function toPhotographer(row: typeof photographers.$inferSelect): Photographer {
   return {
     id: row.id,
     name: row.name,
     city: row.city,
-    hourlyRate: row.hourly_rate,
+    hourlyRate: row.hourlyRate,
     rating: Number(row.rating),
-    createdAt: row.created_at.toISOString(),
+    createdAt: row.createdAt.toISOString(),
   };
 }
 
 export async function listPhotographers(city?: string): Promise<Photographer[]> {
-  // Parameterized query — never interpolate user input into SQL.
-  const { rows } = city
-    ? await pool.query<PhotographerRow>(
-        "SELECT * FROM photographers WHERE city = $1 ORDER BY rating DESC",
-        [city],
-      )
-    : await pool.query<PhotographerRow>(
-        "SELECT * FROM photographers ORDER BY rating DESC",
-      );
+  const rows = await db
+    .select()
+    .from(photographers)
+    // Passing undefined to where() means "no filter" — Drizzle ignores it.
+    .where(city ? eq(photographers.city, city) : undefined)
+    .orderBy(desc(photographers.rating));
   return rows.map(toPhotographer);
 }
 
 export async function getPhotographer(id: number): Promise<Photographer | null> {
-  const { rows } = await pool.query<PhotographerRow>(
-    "SELECT * FROM photographers WHERE id = $1",
-    [id],
-  );
+  const rows = await db
+    .select()
+    .from(photographers)
+    .where(eq(photographers.id, id))
+    .limit(1);
   return rows[0] ? toPhotographer(rows[0]) : null;
 }

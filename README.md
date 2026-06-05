@@ -38,16 +38,17 @@ proxy target is derived from `SERVER_PORT`.
 | `pnpm dev`       | Run server + client together                  |
 | `pnpm test`      | Run vitest                                     |
 | `pnpm typecheck` | Typecheck every package                        |
-| `pnpm db:up`     | Start Postgres (Docker, host port 5433)        |
-| `pnpm db:reset`  | Drop volume, recreate, migrate, seed           |
-| `pnpm migrate`   | Apply schema                                   |
-| `pnpm seed`      | Load sample photographers + bookings           |
+| `pnpm db:up`       | Start Postgres (Docker, host port 5433)      |
+| `pnpm db:generate` | Generate a migration from the Drizzle schema |
+| `pnpm db:reset`    | Drop volume, recreate, migrate, seed         |
+| `pnpm migrate`     | Apply pending migrations                     |
+| `pnpm seed`        | Load sample photographers + bookings         |
 
 ## Structure
 
 ```
 shared/   @snappr/shared   API contracts (types)
-server/   @snappr/server   Express + pg + zod
+server/   @snappr/server   Express + Drizzle ORM (pg) + zod
 client/   @snappr/client   React + Vite + TanStack Query
 ```
 

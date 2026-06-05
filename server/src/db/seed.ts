@@ -1,27 +1,48 @@
+import { sql } from "drizzle-orm";
+import { db } from "./client.js";
 import { pool, waitForDb } from "./pool.js";
+import { bookings, photographers } from "./schema.js";
+
+const inDays = (days: number): Date => new Date(Date.now() + days * 86_400_000);
 
 async function seed(): Promise<void> {
   await waitForDb();
 
   // Idempotent reset so re-running seed gives a clean, known dataset.
-  await pool.query("TRUNCATE bookings, photographers RESTART IDENTITY CASCADE");
+  await db.execute(sql`TRUNCATE bookings, photographers RESTART IDENTITY CASCADE`);
 
-  await pool.query(`
-    INSERT INTO photographers (name, city, hourly_rate, rating) VALUES
-      ('Ana Gómez',       'Bogotá',    120, 4.8),
-      ('Carlos Ruiz',     'Bogotá',     95, 4.5),
-      ('Diana Castro',    'Medellín',  140, 4.9),
-      ('Esteban Marín',   'Medellín',   80, 4.2),
-      ('Felipe Ortega',   'Cali',      110, 4.6),
-      ('Gabriela Lozano', 'Cartagena', 160, 5.0)
-  `);
+  const inserted = await db
+    .insert(photographers)
+    .values([
+      { name: "Ana Gómez", city: "Bogotá", hourlyRate: 120, rating: "4.8" },
+      { name: "Carlos Ruiz", city: "Bogotá", hourlyRate: 95, rating: "4.5" },
+      { name: "Diana Castro", city: "Medellín", hourlyRate: 140, rating: "4.9" },
+      { name: "Esteban Marín", city: "Medellín", hourlyRate: 80, rating: "4.2" },
+      { name: "Felipe Ortega", city: "Cali", hourlyRate: 110, rating: "4.6" },
+      { name: "Gabriela Lozano", city: "Cartagena", hourlyRate: 160, rating: "5.0" },
+    ])
+    .returning({ id: photographers.id });
 
-  await pool.query(`
-    INSERT INTO bookings (photographer_id, client_name, scheduled_at, status) VALUES
-      (1, 'Acme Corp',     now() + interval '2 days', 'confirmed'),
-      (1, 'Studio Bright', now() + interval '5 days', 'pending'),
-      (3, 'Wedding Co',    now() + interval '1 day',  'confirmed')
-  `);
+  await db.insert(bookings).values([
+    {
+      photographerId: inserted[0]!.id,
+      clientName: "Acme Corp",
+      scheduledAt: inDays(2),
+      status: "confirmed",
+    },
+    {
+      photographerId: inserted[0]!.id,
+      clientName: "Studio Bright",
+      scheduledAt: inDays(5),
+      status: "pending",
+    },
+    {
+      photographerId: inserted[2]!.id,
+      clientName: "Wedding Co",
+      scheduledAt: inDays(1),
+      status: "confirmed",
+    },
+  ]);
 
   console.log("✓ seed complete");
   await pool.end();

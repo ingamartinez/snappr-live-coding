@@ -1,32 +1,26 @@
 import type { Booking, CreateBookingInput } from "@snappr/shared";
-import { pool } from "../db/pool.js";
+import { db } from "../db/client.js";
+import { bookings } from "../db/schema.js";
 
-interface BookingRow {
-  id: number;
-  photographer_id: number;
-  client_name: string;
-  scheduled_at: Date;
-  status: Booking["status"];
-  created_at: Date;
-}
-
-function toBooking(row: BookingRow): Booking {
+function toBooking(row: typeof bookings.$inferSelect): Booking {
   return {
     id: row.id,
-    photographerId: row.photographer_id,
-    clientName: row.client_name,
-    scheduledAt: row.scheduled_at.toISOString(),
+    photographerId: row.photographerId,
+    clientName: row.clientName,
+    scheduledAt: row.scheduledAt.toISOString(),
     status: row.status,
-    createdAt: row.created_at.toISOString(),
+    createdAt: row.createdAt.toISOString(),
   };
 }
 
 export async function createBooking(input: CreateBookingInput): Promise<Booking> {
-  const { rows } = await pool.query<BookingRow>(
-    `INSERT INTO bookings (photographer_id, client_name, scheduled_at)
-     VALUES ($1, $2, $3)
-     RETURNING *`,
-    [input.photographerId, input.clientName, input.scheduledAt],
-  );
-  return toBooking(rows[0]!);
+  const [row] = await db
+    .insert(bookings)
+    .values({
+      photographerId: input.photographerId,
+      clientName: input.clientName,
+      scheduledAt: new Date(input.scheduledAt),
+    })
+    .returning();
+  return toBooking(row!);
 }

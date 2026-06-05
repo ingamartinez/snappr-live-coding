@@ -17,6 +17,7 @@
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:reset": "docker compose down -v && docker compose up -d && pnpm migrate && pnpm seed",
+    "db:generate": "pnpm --filter @snappr/server db:generate",
     "migrate": "pnpm --filter @snappr/server migrate",
     "seed": "pnpm --filter @snappr/server seed"
   },
