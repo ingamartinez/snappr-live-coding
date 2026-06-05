@@ -22,8 +22,13 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: clientPort,
+      // Bind all interfaces so the dev server is reachable over the Tailnet/LAN,
+      // not just localhost. Fail loudly if the port is taken instead of bumping it.
+      host: true,
+      strictPort: true,
       proxy: {
-        // Forward API calls to the Express server — port derived from the same .env.
+        // Forward API calls to the Express server. The proxy runs on this machine,
+        // so `localhost` here is always the local backend — even for remote clients.
         "/api": `http://localhost:${serverPort}`,
       },
     },
