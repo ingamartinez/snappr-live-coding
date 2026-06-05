@@ -26,6 +26,10 @@ export default defineConfig(({ mode }) => {
       // not just localhost. Fail loudly if the port is taken instead of bumping it.
       host: true,
       strictPort: true,
+      // Vite rejects unknown Host headers (DNS-rebinding protection) once exposed
+      // beyond localhost. A leading-dot entry allows a domain and all its subdomains —
+      // here, every device on this Tailscale tailnet.
+      allowedHosts: [".tailcabcc8.ts.net"],
       proxy: {
         // Forward API calls to the Express server. The proxy runs on this machine,
         // so `localhost` here is always the local backend — even for remote clients.
