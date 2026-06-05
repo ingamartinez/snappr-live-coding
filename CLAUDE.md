@@ -20,6 +20,30 @@ pnpm db:generate # generate a migration after editing the schema
 
 `pnpm db:reset` wipes the volume and re-applies migrations + seed.
 
+## Environment & ports
+
+All config lives in the **monorepo-root `.env`** (loaded by absolute path, since
+`pnpm --filter` runs each script with its package dir as cwd — a bare dotenv would miss it):
+
+| Variable       | Default | Used by                          |
+| -------------- | ------- | -------------------------------- |
+| `SERVER_PORT`  | `3001`  | Express (`server/src/env.ts`)    |
+| `CLIENT_PORT`  | `5173`  | Vite (`client/vite.config.ts`)   |
+| `DATABASE_URL` | …5433…  | Drizzle pool                     |
+
+- The backend port lives in one place; the client's `/api` proxy target is **derived** from it.
+- Postgres is on host port **5433** (Docker) to avoid clashing with a local Postgres on 5432.
+- **Remote access (Tailnet/LAN):** Vite runs with `host: true` + `allowedHosts` for the
+  tailnet domain, so the app is reachable at `http://<host>.<tailnet>.ts.net:5173`.
+  The **backend is not exposed** — Vite proxies `/api` to `localhost` on this machine.
+  (Express binds `0.0.0.0` by default; Vite binds localhost unless `host: true`.)
+
+## Client routes
+
+- `/` — minimal landing (clean slate for live work).
+- `/example` — the photographers demo (reference). Routes in `client/src/App.tsx`,
+  pages in `client/src/pages/`.
+
 ## Conventions
 
 - **Contracts live in `shared/`.** Add/change an API type there first; both sides must agree or compilation fails.
