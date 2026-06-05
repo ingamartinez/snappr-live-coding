@@ -1,0 +1,27 @@
+{
+  "name": "snappr-live-coding",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "pnpm install && pnpm db:up && pnpm migrate && pnpm seed",
+    "dev": "concurrently -n server,client -c blue,green \"pnpm dev:server\" \"pnpm dev:client\"",
+    "dev:server": "pnpm --filter @snappr/server dev",
+    "dev:client": "pnpm --filter @snappr/client dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d && pnpm migrate && pnpm seed",
+    "migrate": "pnpm --filter @snappr/server migrate",
+    "seed": "pnpm --filter @snappr/server seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3"
+  }
+}
