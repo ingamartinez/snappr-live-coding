@@ -13,6 +13,7 @@
     "dev:client": "pnpm --filter @snappr/client dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
     "test": "pnpm -r test",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
@@ -22,7 +23,10 @@
     "seed": "pnpm --filter @snappr/server seed"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "concurrently": "^9.1.2",
-    "typescript": "^5.7.3"
+    "eslint": "^10.4.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.60.1"
   }
 }

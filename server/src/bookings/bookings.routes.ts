@@ -4,12 +4,9 @@ import { createBookingSchema } from "./bookings.schema.js";
 
 export const bookingsRouter = Router();
 
-bookingsRouter.post("/", async (req, res, next) => {
-  try {
-    const input = createBookingSchema.parse(req.body);
-    const booking = await createBooking(input);
-    res.status(201).json(booking);
-  } catch (err) {
-    next(err);
-  }
+// Express 5 forwards rejected promises to the error handler automatically.
+bookingsRouter.post("/", async (req, res) => {
+  const input = createBookingSchema.parse(req.body);
+  const booking = await createBooking(input);
+  res.status(201).json(booking);
 });
