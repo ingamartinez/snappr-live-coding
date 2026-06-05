@@ -1,12 +1,8 @@
 import { Pool } from "pg";
-import "dotenv/config";
-
-const connectionString =
-  process.env.DATABASE_URL ??
-  "postgres://snappr:snappr@localhost:5433/snappr";
+import { DATABASE_URL } from "../env.js";
 
 // One shared pool for the whole process. Import `pool` anywhere you need to query.
-export const pool = new Pool({ connectionString });
+export const pool = new Pool({ connectionString: DATABASE_URL });
 
 // Wait for Postgres to accept connections — useful right after `docker compose up`,
 // when the container is up but the server inside is still booting.

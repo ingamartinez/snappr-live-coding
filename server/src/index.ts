@@ -2,10 +2,11 @@ import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { ZodError } from "zod";
 import { bookingsRouter } from "./bookings/bookings.routes.js";
+import { SERVER_PORT } from "./env.js";
 import { photographersRouter } from "./photographers/photographers.routes.js";
 
 const app = express();
-const port = Number(process.env.PORT ?? 3001);
+const port = SERVER_PORT;
 
 app.use(cors());
 app.use(express.json());

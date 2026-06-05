@@ -18,6 +18,19 @@ pnpm dev                # http://localhost:5173 (client) + :3001 (server)
 If `pnpm setup` runs before Docker finishes booting Postgres, just run
 `pnpm migrate && pnpm seed` again — both retry the connection.
 
+## Environment
+
+All config lives in the monorepo-root `.env` (both server and client read it):
+
+| Variable       | Default                                          | Used by          |
+| -------------- | ------------------------------------------------ | ---------------- |
+| `SERVER_PORT`  | `3001`                                            | Express server   |
+| `CLIENT_PORT`  | `5173`                                            | Vite dev server  |
+| `DATABASE_URL` | `postgres://snappr:snappr@localhost:5433/snappr` | server (pg pool) |
+
+Change a port in one place and both sides stay in sync — the client's `/api`
+proxy target is derived from `SERVER_PORT`.
+
 ## Scripts
 
 | Command          | What it does                                  |
