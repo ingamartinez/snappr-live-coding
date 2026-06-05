@@ -10,7 +10,7 @@ Node 20+, pnpm, Docker.
 ## Quickstart
 
 ```bash
-cp env.example .env     # optional — defaults already match docker-compose
+cp .env.example .env    # optional — defaults already match docker-compose
 pnpm setup              # install deps, start Postgres, migrate, seed
 pnpm dev                # http://localhost:5173 (client) + :3001 (server)
 ```
