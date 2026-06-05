@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import type { Booking, CreateBookingInput } from "@snappr/shared";
 import { db } from "../db/client.js";
 import { bookings } from "../db/schema.js";
@@ -23,4 +24,15 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
     })
     .returning();
   return toBooking(row!);
+}
+
+// Idempotent: cancelling an already-cancelled booking just returns it. Returns
+// null when no booking has that id, so the route can answer 404.
+export async function cancelBooking(id: number): Promise<Booking | null> {
+  const [row] = await db
+    .update(bookings)
+    .set({ status: "cancelled" })
+    .where(eq(bookings.id, id))
+    .returning();
+  return row ? toBooking(row) : null;
 }

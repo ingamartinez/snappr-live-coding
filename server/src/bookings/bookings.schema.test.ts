@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createBookingSchema } from "./bookings.schema.js";
+import { bookingIdParamSchema, createBookingSchema } from "./bookings.schema.js";
 
 describe("createBookingSchema", () => {
   it("accepts a valid booking payload", () => {
@@ -27,5 +27,21 @@ describe("createBookingSchema", () => {
       scheduledAt: "next tuesday",
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe("bookingIdParamSchema", () => {
+  it("coerces a numeric string id", () => {
+    const result = bookingIdParamSchema.safeParse("42");
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data).toBe(42);
+  });
+
+  it("rejects a non-numeric id", () => {
+    expect(bookingIdParamSchema.safeParse("abc").success).toBe(false);
+  });
+
+  it("rejects a non-positive id", () => {
+    expect(bookingIdParamSchema.safeParse("0").success).toBe(false);
   });
 });
