@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { ZodError } from "zod";
+import { availabilityRouter } from "./availability/availability.routes.js";
 import { bookingsRouter } from "./bookings/bookings.routes.js";
 import { SERVER_PORT } from "./env.js";
 import { photographersRouter } from "./photographers/photographers.routes.js";
@@ -16,6 +17,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/photographers", photographersRouter);
+app.use("/api/photographers/:id/availability", availabilityRouter);
 app.use("/api/bookings", bookingsRouter);
 
 // Central error handler: turn validation errors into 400s, everything else into 500s.
