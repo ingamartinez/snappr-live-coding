@@ -1,4 +1,5 @@
 import type { Photographer } from "@snappr/shared";
+import { cityTimezone } from "@snappr/shared";
 import { desc, eq } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { photographers } from "../db/schema.js";
@@ -33,4 +34,20 @@ export async function getPhotographer(id: number): Promise<Photographer | null> 
     .where(eq(photographers.id, id))
     .limit(1);
   return rows[0] ? toPhotographer(rows[0]) : null;
+}
+
+// Move a photographer to a new city; the timezone follows from the city.
+// Returns null for an unknown id (city is validated at the edge).
+export async function updatePhotographerCity(
+  id: number,
+  city: string,
+): Promise<Photographer | null> {
+  const timezone = cityTimezone(city);
+  if (!timezone) return null;
+  const [row] = await db
+    .update(photographers)
+    .set({ city, timezone })
+    .where(eq(photographers.id, id))
+    .returning();
+  return row ? toPhotographer(row) : null;
 }
