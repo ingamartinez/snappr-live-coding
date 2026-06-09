@@ -32,3 +32,39 @@ export function shortDate(date: string): string {
     timeZone: "UTC",
   });
 }
+
+// A reference instant inside the week — used to resolve offsets DST-correctly
+// (an offset can differ between weeks, so we anchor to the week being shown).
+export function weekReference(weekStart: string): Date {
+  return new Date(`${weekStart}T12:00:00Z`);
+}
+
+// Minutes a timezone is ahead of UTC at a given instant (DST-aware via Intl).
+function offsetMinutes(timeZone: string, at: Date): number {
+  const inTz = new Date(at.toLocaleString("en-US", { timeZone }));
+  const inUtc = new Date(at.toLocaleString("en-US", { timeZone: "UTC" }));
+  return Math.round((inTz.getTime() - inUtc.getTime()) / 60000);
+}
+
+function hhmm(totalMinutes: number): string {
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  return m ? `${h}:${String(m).padStart(2, "0")}` : `${h}`;
+}
+
+// "UTC-5", "UTC+5:30", or "UTC".
+export function utcOffsetLabel(timeZone: string, at: Date): string {
+  const mins = offsetMinutes(timeZone, at);
+  if (mins === 0) return "UTC";
+  return `UTC${mins > 0 ? "+" : "-"}${hhmm(Math.abs(mins))}`;
+}
+
+// How far `toTz` is ahead of `fromTz`: "+7h", "−3h 30m", or "same time".
+export function offsetDeltaLabel(fromTz: string, toTz: string, at: Date): string {
+  const diff = offsetMinutes(toTz, at) - offsetMinutes(fromTz, at);
+  if (diff === 0) return "same time";
+  const abs = Math.abs(diff);
+  const h = Math.floor(abs / 60);
+  const m = abs % 60;
+  return `${diff > 0 ? "+" : "−"}${h}h${m ? ` ${m}m` : ""}`;
+}

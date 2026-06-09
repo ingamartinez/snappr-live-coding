@@ -3,7 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchAvailability, fetchPhotographer } from "../api.js";
-import { addDays, mondayOf, shortDate, weekDays, weekdayLabel } from "../dates.js";
+import {
+  addDays,
+  mondayOf,
+  offsetDeltaLabel,
+  shortDate,
+  utcOffsetLabel,
+  weekDays,
+  weekdayLabel,
+  weekReference,
+} from "../dates.js";
+import { defaultViewerCity, VIEWER_CITIES } from "../timezones.js";
 import { AvailabilityEditor } from "./AvailabilityEditor.js";
 
 export function AvailabilityPage() {
@@ -11,6 +21,7 @@ export function AvailabilityPage() {
   const photographerId = Number(id);
   const [weekStart, setWeekStart] = useState(() => mondayOf(new Date()));
   const [editing, setEditing] = useState(false);
+  const [viewer, setViewer] = useState(defaultViewerCity);
 
   const photographer = useQuery({
     queryKey: ["photographer", photographerId],
@@ -23,6 +34,8 @@ export function AvailabilityPage() {
   });
 
   const slotsByDate = groupByDate(availability.data ?? []);
+  const pe = photographer.data;
+  const refDate = weekReference(weekStart);
 
   return (
     <main>
@@ -40,6 +53,43 @@ export function AvailabilityPage() {
           Next week →
         </button>
       </div>
+
+      {pe &&
+        (editing ? (
+          <p className="tz-note muted">
+            Editing in {pe.city} local time ({utcOffsetLabel(pe.timezone, refDate)}).
+          </p>
+        ) : (
+          <div className="tz-bar">
+            <label className="tz-select">
+              Viewing from{" "}
+              <select
+                value={viewer.timeZone}
+                onChange={(e) =>
+                  setViewer(
+                    VIEWER_CITIES.find((c) => c.timeZone === e.target.value) ?? viewer,
+                  )
+                }
+              >
+                {VIEWER_CITIES.map((c) => (
+                  <option key={c.timeZone} value={c.timeZone}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="tz-note muted">
+              Times shown in {pe.city} time ({utcOffsetLabel(pe.timezone, refDate)}).
+              {viewer.timeZone !== pe.timezone && (
+                <>
+                  {" "}
+                  You&rsquo;re in {viewer.label} (
+                  {offsetDeltaLabel(pe.timezone, viewer.timeZone, refDate)} from {pe.city}).
+                </>
+              )}
+            </p>
+          </div>
+        ))}
 
       {availability.isLoading && <p>Loading…</p>}
       {availability.error && <p className="error">{(availability.error as Error).message}</p>}
