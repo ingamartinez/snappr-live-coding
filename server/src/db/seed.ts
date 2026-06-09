@@ -29,12 +29,13 @@ async function seed(): Promise<void> {
   const inserted = await db
     .insert(photographers)
     .values([
-      { name: "Ana Gómez", city: "Bogotá", hourlyRate: 120, rating: "4.8" },
-      { name: "Carlos Ruiz", city: "Bogotá", hourlyRate: 95, rating: "4.5" },
-      { name: "Diana Castro", city: "Medellín", hourlyRate: 140, rating: "4.9" },
-      { name: "Esteban Marín", city: "Medellín", hourlyRate: 80, rating: "4.2" },
-      { name: "Felipe Ortega", city: "Cali", hourlyRate: 110, rating: "4.6" },
-      { name: "Gabriela Lozano", city: "Cartagena", hourlyRate: 160, rating: "5.0" },
+      // All seeded photographers are in Colombia (America/Bogota, UTC-5).
+      { name: "Ana Gómez", city: "Bogotá", timezone: "America/Bogota", hourlyRate: 120, rating: "4.8" },
+      { name: "Carlos Ruiz", city: "Bogotá", timezone: "America/Bogota", hourlyRate: 95, rating: "4.5" },
+      { name: "Diana Castro", city: "Medellín", timezone: "America/Bogota", hourlyRate: 140, rating: "4.9" },
+      { name: "Esteban Marín", city: "Medellín", timezone: "America/Bogota", hourlyRate: 80, rating: "4.2" },
+      { name: "Felipe Ortega", city: "Cali", timezone: "America/Bogota", hourlyRate: 110, rating: "4.6" },
+      { name: "Gabriela Lozano", city: "Cartagena", timezone: "America/Bogota", hourlyRate: 160, rating: "5.0" },
     ])
     .returning({ id: photographers.id });
 

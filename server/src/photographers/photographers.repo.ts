@@ -9,6 +9,7 @@ function toPhotographer(row: typeof photographers.$inferSelect): Photographer {
     id: row.id,
     name: row.name,
     city: row.city,
+    timezone: row.timezone,
     hourlyRate: row.hourlyRate,
     rating: Number(row.rating),
     createdAt: row.createdAt.toISOString(),

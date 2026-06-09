@@ -26,6 +26,8 @@ export const photographers = pgTable(
     id: serial("id").primaryKey(),
     name: text("name").notNull(),
     city: text("city").notNull(),
+    // IANA timezone anchoring this photographer's wall-clock availability.
+    timezone: text("timezone").notNull().default("UTC"),
     hourlyRate: integer("hourly_rate").notNull(),
     // numeric maps to string in JS to avoid float precision loss; we parse at the edge.
     rating: numeric("rating", { precision: 2, scale: 1 }).notNull().default("0"),

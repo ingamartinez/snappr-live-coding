@@ -6,6 +6,9 @@ export interface Photographer {
   id: number;
   name: string;
   city: string;
+  // IANA timezone (e.g. "America/Bogota") — the anchor for the photographer's
+  // wall-clock availability. The calendar labels times in this zone.
+  timezone: string;
   hourlyRate: number;
   rating: number;
   createdAt: string;
