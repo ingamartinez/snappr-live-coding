@@ -4,6 +4,7 @@ import type {
   CreateBookingInput,
   Photographer,
   SetAvailabilityInput,
+  UpdatePhotographerInput,
 } from "@snappr/shared";
 
 // Thin typed fetch wrapper. Returns parsed JSON or throws on non-2xx.
@@ -33,6 +34,16 @@ export function createBooking(input: CreateBookingInput): Promise<Booking> {
 
 export function fetchPhotographer(id: number): Promise<Photographer> {
   return request<Photographer>(`/api/photographers/${id}`);
+}
+
+export function updatePhotographer(
+  id: number,
+  input: UpdatePhotographerInput,
+): Promise<Photographer> {
+  return request<Photographer>(`/api/photographers/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
 }
 
 export function fetchAvailability(

@@ -1,8 +1,9 @@
 import type { AvailabilitySlot } from "@snappr/shared";
-import { useQuery } from "@tanstack/react-query";
+import { CITIES } from "@snappr/shared";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchAvailability, fetchPhotographer } from "../api.js";
+import { fetchAvailability, fetchPhotographer, updatePhotographer } from "../api.js";
 import {
   addDays,
   mondayOf,
@@ -13,12 +14,13 @@ import {
   weekdayLabel,
   weekReference,
 } from "../dates.js";
-import { defaultViewerCity, VIEWER_CITIES } from "../timezones.js";
+import { defaultViewerCity } from "../timezones.js";
 import { AvailabilityEditor } from "./AvailabilityEditor.js";
 
 export function AvailabilityPage() {
   const { id } = useParams();
   const photographerId = Number(id);
+  const queryClient = useQueryClient();
   const [weekStart, setWeekStart] = useState(() => mondayOf(new Date()));
   const [editing, setEditing] = useState(false);
   const [viewer, setViewer] = useState(defaultViewerCity);
@@ -31,6 +33,14 @@ export function AvailabilityPage() {
   const availability = useQuery({
     queryKey: ["availability", photographerId, weekStart],
     queryFn: () => fetchAvailability(photographerId, weekStart),
+  });
+
+  // Changing the photographer's city moves their timezone too (derived server-side).
+  const cityMutation = useMutation({
+    mutationFn: (city: string) => updatePhotographer(photographerId, { city }),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(["photographer", photographerId], updated);
+    },
   });
 
   const slotsByDate = groupByDate(availability.data ?? []);
@@ -56,35 +66,52 @@ export function AvailabilityPage() {
 
       {pe &&
         (editing ? (
-          <p className="tz-note muted">
-            Editing in {pe.city} local time ({utcOffsetLabel(pe.timezone, refDate)}).
-          </p>
+          <div className="tz-bar">
+            <label className="tz-select">
+              Photographer&rsquo;s city{" "}
+              <select
+                value={pe.city}
+                disabled={cityMutation.isPending}
+                onChange={(e) => cityMutation.mutate(e.target.value)}
+              >
+                {CITIES.map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="tz-note muted">
+              Editing in {pe.city} local time ({utcOffsetLabel(pe.timezone, refDate)}).
+            </p>
+            {cityMutation.error && (
+              <p className="error">{(cityMutation.error as Error).message}</p>
+            )}
+          </div>
         ) : (
           <div className="tz-bar">
             <label className="tz-select">
               Viewing from{" "}
               <select
-                value={viewer.timeZone}
+                value={viewer.name}
                 onChange={(e) =>
-                  setViewer(
-                    VIEWER_CITIES.find((c) => c.timeZone === e.target.value) ?? viewer,
-                  )
+                  setViewer(CITIES.find((c) => c.name === e.target.value) ?? viewer)
                 }
               >
-                {VIEWER_CITIES.map((c) => (
-                  <option key={c.timeZone} value={c.timeZone}>
-                    {c.label}
+                {CITIES.map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
                   </option>
                 ))}
               </select>
             </label>
             <p className="tz-note muted">
               Times shown in {pe.city} time ({utcOffsetLabel(pe.timezone, refDate)}).
-              {viewer.timeZone !== pe.timezone && (
+              {viewer.timezone !== pe.timezone && (
                 <>
                   {" "}
-                  You&rsquo;re in {viewer.label} (
-                  {offsetDeltaLabel(pe.timezone, viewer.timeZone, refDate)} from {pe.city}).
+                  You&rsquo;re in {viewer.name} (
+                  {offsetDeltaLabel(pe.timezone, viewer.timezone, refDate)} from {pe.city}).
                 </>
               )}
             </p>
