@@ -29,6 +29,27 @@ export interface CreateBookingInput {
   scheduledAt: string;
 }
 
+// A single availability interval on a concrete date (wall-clock, no timezone).
+export interface AvailabilitySlot {
+  id: number;
+  photographerId: number;
+  date: string; // YYYY-MM-DD
+  startTime: string; // HH:MM
+  endTime: string; // HH:MM
+}
+
+// Full-week replace payload: every slot's date must fall within the week that
+// starts on `weekStart` (a Monday). Replaces all of that photographer's slots
+// in that week.
+export interface SetAvailabilityInput {
+  weekStart: string; // YYYY-MM-DD, must be a Monday
+  slots: Array<{
+    date: string; // YYYY-MM-DD
+    startTime: string; // HH:MM
+    endTime: string; // HH:MM
+  }>;
+}
+
 // Generic API error envelope returned by the server.
 export interface ApiError {
   error: string;
