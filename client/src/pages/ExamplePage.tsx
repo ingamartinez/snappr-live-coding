@@ -44,6 +44,9 @@ export function ExamplePage() {
             </div>
             <div className="muted">{p.city}</div>
             <div className="rate">${p.hourlyRate}/hr</div>
+            <Link to={`/example/${p.id}/availability`} className="card-link">
+              View availability →
+            </Link>
           </li>
         ))}
       </ul>

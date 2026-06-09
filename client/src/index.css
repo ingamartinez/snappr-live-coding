@@ -92,3 +92,192 @@ h1 {
 .back:hover {
   color: #1a1a2e;
 }
+
+.card-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: #3b5bdb;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.week-nav button {
+  border: 1px solid #d0d3e0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.tz-bar {
+  margin-bottom: 1.25rem;
+}
+
+.tz-select {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.tz-select select {
+  border: 1px solid #d0d3e0;
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.tz-note {
+  margin: 0.5rem 0 0;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.day-col {
+  background: #fff;
+  border: 1px solid #e7e9f2;
+  border-radius: 10px;
+  padding: 0.6rem 0.45rem;
+  min-height: 90px;
+}
+
+.day-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.day-head .muted {
+  font-size: 0.75rem;
+}
+
+.day-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.slot {
+  background: #eef2ff;
+  color: #3b5bdb;
+  border-radius: 6px;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.78rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.off {
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .calendar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.edit-btn {
+  margin-top: 1.25rem;
+  border: 1px solid #1a1a2e;
+  background: #1a1a2e;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.editor-day {
+  background: #fff;
+  border: 1px solid #e7e9f2;
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+}
+
+.editor-day-head {
+  margin-bottom: 0.5rem;
+}
+
+.editor-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.editor-row input[type="time"] {
+  border: 1px solid #d0d3e0;
+  border-radius: 6px;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.85rem;
+}
+
+.add-interval {
+  border: 1px dashed #c0c4d4;
+  background: #fff;
+  color: #3b5bdb;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.link-danger {
+  border: none;
+  background: none;
+  color: #c0392b;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.editor-actions button {
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: 1px solid #1a1a2e;
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.editor-actions button.secondary {
+  background: #fff;
+  color: #1a1a2e;
+}
+
+.editor-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
