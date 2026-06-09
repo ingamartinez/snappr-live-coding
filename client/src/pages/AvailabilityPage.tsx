@@ -4,11 +4,13 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchAvailability, fetchPhotographer } from "../api.js";
 import { addDays, mondayOf, shortDate, weekDays, weekdayLabel } from "../dates.js";
+import { AvailabilityEditor } from "./AvailabilityEditor.js";
 
 export function AvailabilityPage() {
   const { id } = useParams();
   const photographerId = Number(id);
   const [weekStart, setWeekStart] = useState(() => mondayOf(new Date()));
+  const [editing, setEditing] = useState(false);
 
   const photographer = useQuery({
     queryKey: ["photographer", photographerId],
@@ -30,38 +32,56 @@ export function AvailabilityPage() {
       <h1>{photographer.data ? `${photographer.data.name} — Availability` : "Availability"}</h1>
 
       <div className="week-nav">
-        <button onClick={() => setWeekStart((w) => addDays(w, -7))}>← Prev week</button>
+        <button onClick={() => setWeekStart((w) => addDays(w, -7))} disabled={editing}>
+          ← Prev week
+        </button>
         <span className="muted">Week of {shortDate(weekStart)}</span>
-        <button onClick={() => setWeekStart((w) => addDays(w, 7))}>Next week →</button>
+        <button onClick={() => setWeekStart((w) => addDays(w, 7))} disabled={editing}>
+          Next week →
+        </button>
       </div>
 
       {availability.isLoading && <p>Loading…</p>}
       {availability.error && <p className="error">{(availability.error as Error).message}</p>}
 
-      <div className="calendar">
-        {weekDays(weekStart).map((date, i) => {
-          const slots = slotsByDate.get(date) ?? [];
-          return (
-            <div key={date} className="day-col">
-              <div className="day-head">
-                <strong>{weekdayLabel(i)}</strong>
-                <span className="muted">{shortDate(date)}</span>
-              </div>
-              <div className="day-slots">
-                {slots.length > 0 ? (
-                  slots.map((s) => (
-                    <div key={s.id} className="slot">
-                      {s.startTime}–{s.endTime}
-                    </div>
-                  ))
-                ) : (
-                  <span className="muted off">—</span>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {editing ? (
+        <AvailabilityEditor
+          photographerId={photographerId}
+          weekStart={weekStart}
+          initialSlots={availability.data ?? []}
+          onDone={() => setEditing(false)}
+        />
+      ) : (
+        <>
+          <div className="calendar">
+            {weekDays(weekStart).map((date, i) => {
+              const slots = slotsByDate.get(date) ?? [];
+              return (
+                <div key={date} className="day-col">
+                  <div className="day-head">
+                    <strong>{weekdayLabel(i)}</strong>
+                    <span className="muted">{shortDate(date)}</span>
+                  </div>
+                  <div className="day-slots">
+                    {slots.length > 0 ? (
+                      slots.map((s) => (
+                        <div key={s.id} className="slot">
+                          {s.startTime}–{s.endTime}
+                        </div>
+                      ))
+                    ) : (
+                      <span className="muted off">—</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <button className="edit-btn" onClick={() => setEditing(true)}>
+            Edit availability
+          </button>
+        </>
+      )}
     </main>
   );
 }
